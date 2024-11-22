@@ -5,10 +5,24 @@
 
   // User-defined settings for beep sound
   let frequency = 440; // in Hz (A4)
-  let volume = 0.1;
+  let logFreq = Math.log(frequency); 
+  let maxLogFrequent = Math.log(20000);
+
+  $: frequency = round(Math.pow(Math.E, logFreq), 100);
+  
+
+  let volume = 0.5;
   let waveShape: OscillatorType = 'sine'; 
   let interval = 1000;
-  let durationPercent = 0.1;    // 100ms.
+  let durationPercent = 0.04;
+
+  let startTime = 0;
+  let lastTime = 0; 
+
+
+  function round(n: number, factor: number) : number {
+    return Math.round(n * factor) / factor;
+  }
 
   // Initialize the AudioContext
   function initAudioContext() {
@@ -18,6 +32,9 @@
   }
 
   function playBeep() {
+    const now = performance.now();
+    console.log(`time passed: ${now - startTime}, interval: ${now - lastTime}`);
+    lastTime = now;
     const oscillator = context.createOscillator();
     oscillator.type = waveShape;
     oscillator.frequency.setValueAtTime(frequency, context.currentTime);
@@ -36,6 +53,7 @@
   function toggleBeeping() {
     initAudioContext();
     if (!isBeeping) {
+      lastTime = startTime = performance.now();
       intervalId = setInterval(playBeep, interval); // Play beep at selected interval
       isBeeping = true;
     } else {
@@ -53,8 +71,8 @@
   <div class="controls">
     <div class="control-item">
       <label for="frequency">Frequency (Hz):</label>
-      <input id="frequency" type="range" min="20" max="20000" step="10" bind:value={frequency} />
-      <span>{frequency} Hz</span>
+      <input id="frequency" type="range" min="{Math.log(10)}" max="{maxLogFrequent}" step="0.1" bind:value={logFreq} />
+      <input id="frequency" type="number" min="20" max="20000" bind:value={frequency} />
     </div>
 
     <div class="control-item">
@@ -76,13 +94,12 @@
     <div class="control-item">
       <label for="interval">Interval (ms):</label>
       <input id="interval" type="number" min="100" max="5000" step="100" bind:value={interval} />
-      <span>{interval} ms</span>
     </div>
 
     <div class="control-item">
-      <label for="interval">Duration (%):</label>
-      <input id="interval" type="range"  min="0" max="1" step="0.01" bind:value={durationPercent} />
-      <span>{durationPercent}%</span>
+      <label for="duration">Duration (%):</label>
+      <input id="duration" type="range"  min="0.01" max="1" step="0.01" bind:value={durationPercent} />
+      <span>{round(durationPercent * 100, 100)}%</span>
     </div>
 
   </div>
