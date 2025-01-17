@@ -1,4 +1,5 @@
 <script lang="ts">
+  
   let isBeeping = false;
   let intervalId: number;
   let context: AudioContext;
@@ -19,6 +20,18 @@
   let startTime = 0;
   let lastTime = 0; 
 
+  class Log {
+    time: number;
+    interval: number;
+    constructor(time: number, interval: number) {
+      this.time = round(time, 100);
+      this.interval = round(interval, 100);
+    }
+  }
+  const MAX_LOG = 10;
+
+  let logs: Log[] = []
+
 
   function round(n: number, factor: number) : number {
     return Math.round(n * factor) / factor;
@@ -32,9 +45,6 @@
   }
 
   function playBeep() {
-    const now = performance.now();
-    console.log(`time passed: ${now - startTime}, interval: ${now - lastTime}`);
-    lastTime = now;
     const oscillator = context.createOscillator();
     oscillator.type = waveShape;
     oscillator.frequency.setValueAtTime(frequency, context.currentTime);
@@ -45,8 +55,15 @@
     oscillator.connect(gainNode);
     gainNode.connect(context.destination);
     
+    const now = performance.now();
     oscillator.start();
     oscillator.stop(context.currentTime + (durationPercent * interval)/1000); // Play the beep for 100ms
+
+    logs.push(new Log(now - startTime, now - lastTime));
+    if (logs.length > MAX_LOG)
+      logs.splice(0, logs.length - MAX_LOG);
+    logs = logs;
+    lastTime = now;
   }
 
   // Function to toggle the beeping sound
@@ -108,6 +125,17 @@
   <button on:click={toggleBeeping}>
     {isBeeping ? "Stop Beeping" : "Start Beeping"}
   </button>
+
+  <table>
+    <thead>
+    <tr><th>Time</th><th>interval</th></tr>
+    </thead>
+    <tbody>
+    {#each logs as log}
+      <tr><td>{log.time}</td><td>{log.interval}</td></tr>
+    {/each}
+    </tbody>
+  </table>
 </main>
 
 <style>
