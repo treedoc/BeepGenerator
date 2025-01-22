@@ -98,24 +98,26 @@
       <span>{volume}</span>
     </div>
 
-    <div class="control-item">
-      <label for="waveShape">Wave Shape:</label>
-      <select id="waveShape" bind:value={waveShape}>
-        <option value="sine">Sine</option>
-        <option value="square">Square</option>
-        <option value="triangle">Triangle</option>
-        <option value="sawtooth">Sawtooth</option>
-      </select>
+    <div class="control-line">
+      <div class="control-item">
+        <label for="waveShape">Wave Shape:</label>
+        <select id="waveShape" bind:value={waveShape}>
+          <option value="sine">Sine</option>
+          <option value="square">Square</option>
+          <option value="triangle">Triangle</option>
+          <option value="sawtooth">Sawtooth</option>
+        </select>
+      </div>
+
+      <div class="control-item">
+        <label for="interval">Interval (ms):</label>
+        <input id="interval" type="number" min="100" max="5000" step="100" bind:value={interval} />
+      </div>
     </div>
 
-    <div class="control-item">
-      <label for="interval">Interval (ms):</label>
-      <input id="interval" type="number" min="100" max="5000" step="100" bind:value={interval} />
-    </div>
-
-    <div class="control-item">
+    <div class="control-item full-width">
       <label for="duration">Duration (%):</label>
-      <input id="duration" type="range"  min="0.01" max="1" step="0.01" bind:value={durationPercent} />
+      <input id="duration" type="range"  min="0.001" max="1" step="0.001" bind:value={durationPercent} />
       <span>{round(durationPercent * 100, 100)}%</span>
     </div>
 
